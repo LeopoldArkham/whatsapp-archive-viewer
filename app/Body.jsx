@@ -7,6 +7,7 @@ import v4 from 'uuid/v4';
 const styles = {
 
   message: css`
+  position: relative;
     padding: 10px;
     margin: 10px 10px 10px auto;
     background-color: #DCF8C6;
@@ -15,17 +16,20 @@ const styles = {
     width: fit-content;
     border-radius: 10px;
   `,
+  padRight: css`
+    padding-right: 60px 
+  `,
   otherSender: css`
     margin: 10px auto 10px 10px;
     background: white;
   `,
   timeSent: css`
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
     font-style: italic;
     font-size: 0.9em;
     color: grey;
-    width: 100%;
-    margin-top: 3px;
-    text-align: right;
   `,
 };
 
@@ -39,7 +43,7 @@ const Message = ({
 }) => {
 
   return (
-    <div className={cx(styles.message, { [styles.otherSender]: isSender1 })}>
+    <div className={cx(styles.message, { [styles.otherSender]: isSender1, [styles.padRight]: message.length <= 115 })}>
       {message}
       <div className={styles.timeSent}>
         {time}
@@ -51,7 +55,7 @@ const Message = ({
 
 const Body = ({ chat, sender1 }) => {
   return (
-    <Pane width="1200px" margin="auto" paddingTop="70px">
+    <Pane width="1200px" margin="auto" paddingTop="70px" zIndex="0">
       {chat?.map((msg) => {
         const [
           date,

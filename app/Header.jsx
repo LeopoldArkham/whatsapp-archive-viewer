@@ -5,6 +5,7 @@ import { Pane, Heading, FilePicker, majorScale } from 'evergreen-ui';
 
 const styles = {
   header: css`
+    z-index: 1;
     display: flex;
     background: whitesmoke;
     position: fixed;
