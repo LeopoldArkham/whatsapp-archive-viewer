@@ -25,8 +25,8 @@ const styles = {
   `,
   timeSent: css`
     position: absolute;
-    right: 5px;
-    bottom: 5px;
+    right: 4px;
+    bottom: 4px;
     font-style: italic;
     font-size: 0.9em;
     color: grey;
