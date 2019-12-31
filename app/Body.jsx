@@ -40,10 +40,11 @@ const Message = ({
   sender,
   message,
   isSender1,
+  swapSides,
 }) => {
 
   return (
-    <div className={cx(styles.message, { [styles.otherSender]: isSender1, [styles.padRight]: message.length <= 115 })}>
+    <div className={cx(styles.message, { [styles.otherSender]: isSender1 ^ swapSides, [styles.padRight]: message.length <= 115 })}>
       {message}
       <div className={styles.timeSent}>
         {time}
@@ -53,7 +54,7 @@ const Message = ({
 }
 
 
-const Body = ({ chat, sender1 }) => {
+const Body = ({ chat, sender1, swapSides }) => {
   return (
     <Pane width="1200px" margin="auto" paddingTop="70px" zIndex="0">
       {chat?.map((msg) => {
@@ -72,6 +73,7 @@ const Body = ({ chat, sender1 }) => {
             sender={sender}
             message={message}
             isSender1={sender === sender1}
+            swapSides={swapSides}
           />
         );
       })}

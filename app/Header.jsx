@@ -1,12 +1,13 @@
 import React from 'react';
 import { css } from 'emotion'
-import { Pane, Heading, FilePicker, majorScale } from 'evergreen-ui';
+import { Pane, Heading, FilePicker, Button, majorScale } from 'evergreen-ui';
 
 
 const styles = {
   header: css`
     z-index: 1;
     display: flex;
+    justify-content: space-between;
     background: whitesmoke;
     position: fixed;
     top: 0;
@@ -16,7 +17,7 @@ const styles = {
 }
 
 
-const Header = ({ processChat }) => {
+const Header = ({ processChat, setSwapSides }) => {
   let reader;
 
 
@@ -33,8 +34,11 @@ const Header = ({ processChat }) => {
   }
   
   return (
-    <Pane className={styles.header}>
+    <Pane display="flex" className={styles.header}>
       <Heading size={700}>Whatsapp Archive Viewer</Heading>
+      <Button iconBefore="swap-horizontal" onClick={() => setSwapSides(prevValue => !prevValue)}>
+        Swap sides
+      </Button>
       <FilePicker
         multiple={false}
         placeholder="Upload a WhatsApp archive file"

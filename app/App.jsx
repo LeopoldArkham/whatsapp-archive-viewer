@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
-import { css } from 'emotion';
 import chunk from 'lodash.chunk';
 
 import Header from './Header';
 import Body from './Body';
 
 
-// const styles = {
-//   background: css`
-//     ;
-//     height: 100%;
-//   `
-// }
-
-
 const App = () => {
   const [ chat, setChat ] = useState(null);
+  const [ swapSides, setSwapSides ] = useState(false);
   const [ sender1, setSender1 ] = useState(null);
 
+  console.log(swapSides);
+  
   const processChat = (raw) => {
     const regex = /(\d{1,2}\/\d{1,2}\/\d{1,2}), (\d{2}:\d{2}) - (\w+):/g;
     const split = raw.split(regex).slice(1);
@@ -30,8 +24,8 @@ const App = () => {
 
   return (
     <div>
-      <Header processChat={processChat}/>
-      <Body chat={chat} sender1={sender1} />
+      <Header processChat={processChat} setSwapSides={setSwapSides}/>
+      <Body chat={chat} sender1={sender1} swapSides={swapSides}/>
     </div >
   );
 }
