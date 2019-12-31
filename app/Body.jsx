@@ -46,7 +46,7 @@ const Message = ({
 
 const Body = ({ chat, sender1 }) => {
   return (
-    <Pane width="1200px" background="tint1">
+    <Pane width="1200px" margin="auto" background="tint1">
       {chat?.map((msg) => {
         const [
           date,
