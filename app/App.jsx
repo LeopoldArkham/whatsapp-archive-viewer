@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
+import { css } from 'emotion';
 import chunk from 'lodash.chunk';
 
 import Header from './Header';
 import Body from './Body';
+
+
+// const styles = {
+//   background: css`
+//     ;
+//     height: 100%;
+//   `
+// }
+
 
 const App = () => {
   const [ chat, setChat ] = useState(null);
@@ -19,10 +29,10 @@ const App = () => {
   }
 
   return (
-    <React.Fragment>
+    <div>
       <Header processChat={processChat}/>
       <Body chat={chat} sender1={sender1} />
-    </React.Fragment>
+    </div >
   );
 }
 

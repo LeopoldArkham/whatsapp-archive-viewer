@@ -1,5 +1,18 @@
 import React from 'react';
+import { css } from 'emotion'
 import { Pane, Heading, FilePicker, majorScale } from 'evergreen-ui';
+
+
+const styles = {
+  header: css`
+    display: flex;
+    background: whitesmoke;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: ${majorScale(2)}px;
+  `
+}
 
 
 const Header = ({ processChat }) => {
@@ -19,15 +32,13 @@ const Header = ({ processChat }) => {
   }
   
   return (
-    <Pane display="flex" background="tint2" padding={majorScale(2)}>
-      <Pane>
-        <Heading size={700}>Whatsapp Archive Viewer</Heading>
-        <FilePicker
-          multiple={false}
-          placeholder="Upload a whatsapp archive"
-          accept=".txt"
-          onChange={handleFileChosen} />
-      </Pane>
+    <Pane className={styles.header}>
+      <Heading size={700}>Whatsapp Archive Viewer</Heading>
+      <FilePicker
+        multiple={false}
+        placeholder="Upload a WhatsApp archive file"
+        accept=".txt"
+        onChange={handleFileChosen} />
     </Pane>
   );
 };
