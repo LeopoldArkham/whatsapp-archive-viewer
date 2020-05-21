@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import chunk from 'lodash.chunk';
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+dayjs.extend(advancedFormat);
 
 import Header from './Header';
 import Body from './Body';
@@ -29,10 +31,10 @@ const App = () => {
     const grouped = chunk(parsed, 4);
 
     
-    const fistMessageDate = grouped[0][0]
+    const firstMessageDate = grouped[0][0]
     const initialDate = {
       _type: 'date',
-      date: fistMessageDate,
+      date: dayjs(firstMessageDate).format('MMM Do YYYY'),
     };
     
     /**
@@ -58,7 +60,7 @@ const App = () => {
         return [...acc, messageObject];
       }
       else {
-        const dateObject = { _type: 'date', date: message[0] };
+        const dateObject = { _type: 'date', date: dayjs(message[0]).format('MMM Do YYYY') };
         return [ ...acc, dateObject, messageObject ];
       }
     }, [initialDate]);
