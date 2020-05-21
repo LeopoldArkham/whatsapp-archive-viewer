@@ -7,14 +7,28 @@ import v4 from 'uuid/v4';
 const styles = {
 
   message: css`
-  position: relative;
-    padding: 10px;
+    position: relative;
+    padding: 8px;
     margin: 10px 10px 10px auto;
     background-color: #DCF8C6;
     font-family: "Segoe UI";
     max-width: 66%;
     width: fit-content;
     border-radius: 10px;
+    box-shadow: 0px 1px 0px 0px rgba(184,184,184,0.5);
+  `,
+  dateStamp: css`
+    position: sticky;
+    top: 80px;
+    padding: 8px;
+    margin: 10px auto 10px auto;
+    background-color: #e1f3fb;
+    width: 120px;
+    text-align: center;
+    border-radius: 10px;
+    font-family: "Segoe UI";
+    box-shadow: 0px 1px 0px 0px rgba(184,184,184,0.8);
+    z-index: 5;
   `,
   padRight: css`
     padding-right: 60px 
@@ -35,9 +49,7 @@ const styles = {
 
 
 const Message = ({
-  date,
   time,
-  sender,
   message,
   isSender1,
   swapSides,
@@ -55,27 +67,37 @@ const Message = ({
 
 
 const Body = ({ chat, sender1, swapSides }) => {
+  if (chat == null) return null;
+
   return (
     <Pane width="1200px" margin="auto" paddingTop="70px" zIndex="0">
-      {chat?.map((msg) => {
-        const [
-          date,
-          time,
-          sender,
-          message,
-        ] = msg;
+      {chat.map(object => {
+        if (object._type === 'date') {
+          return (
+            <div className={styles.dateStamp}>
+              {object.date}
+            </div>
+          )
+        }
+        else {
+          const {
+            time,
+            author,
+            message,
+          } = object;
 
-        return (
-          <Message
-            key={v4()}
-            date={date}
-            time={time}
-            sender={sender}
-            message={message}
-            isSender1={sender === sender1}
-            swapSides={swapSides}
-          />
-        );
+
+          return (
+            <Message
+              key={v4()}
+              time={time}
+              message={message}
+              isSender1={author === sender1}
+              swapSides={swapSides}
+            />
+          );
+
+        }
       })}
     </Pane>
   );
