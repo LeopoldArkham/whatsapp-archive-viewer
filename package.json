@@ -32,6 +32,7 @@
     "webpack-dev-server": "^3.10.0"
   },
   "dependencies": {
+    "dayjs": "^1.8.27",
     "emotion": "^10.0.27",
     "evergreen-ui": "^4.21.5",
     "lodash.chunk": "^4.2.0",
