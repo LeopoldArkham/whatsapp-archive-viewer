@@ -75,8 +75,8 @@ const App = () => {
 
   return (
     <div>
-      <Header processChat={processChat} setSwapSides={setSwapSides}/>
-      <Body chat={chat} sender1={sender1} swapSides={swapSides}/>
+      <Header processChat={processChat} setSwapSides={setSwapSides} chatLoaded={chat != null} />
+      <Body chat={chat} sender1={sender1} swapSides={swapSides} />
     </div >
   );
 }

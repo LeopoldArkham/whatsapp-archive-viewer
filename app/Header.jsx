@@ -17,9 +17,8 @@ const styles = {
 }
 
 
-const Header = ({ processChat, setSwapSides }) => {
+const Header = ({ processChat, setSwapSides, chatLoaded }) => {
   let reader;
-
 
   const handleFileRead = () => {
     const content = reader.result;
@@ -36,7 +35,7 @@ const Header = ({ processChat, setSwapSides }) => {
   return (
     <Pane display="flex" className={styles.header}>
       <Heading size={700}>Whatsapp Archive Viewer</Heading>
-      <Button iconBefore="swap-horizontal" onClick={() => setSwapSides(prevValue => !prevValue)}>
+      <Button iconBefore="swap-horizontal" onClick={() => setSwapSides(prevValue => !prevValue)} disabled={!chatLoaded}>
         Swap sides
       </Button>
       <FilePicker
