@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { css, cx } from 'emotion';
 import { Pane, Autocomplete } from 'evergreen-ui';
 import v4 from 'uuid/v4';
 
+const THRESHOLD = 100;
 
 const styles = {
 
@@ -76,7 +77,6 @@ const styles = {
   `,
 };
 
-
 const Message = ({
   time,
   message,
@@ -103,14 +103,16 @@ const Message = ({
   );
 }
 
+const Body = ({ chat, sender1, swapSides, limitRendering }) => {
 
-const Body = ({ chat, sender1, swapSides }) => {
   if (chat == null) return null;
+
   let prevMessage = chat[1];
+  const list = limitRendering ? chat.slice(0, THRESHOLD) : chat;
 
   return (
     <Pane width="1200px" margin="auto" paddingTop="70px" zIndex="0">
-      {chat.slice(0, 100).map(object => {
+      {list.map(object => {
         if (object._type === 'date') {
           return (
             <div className={styles.dateStamp}>
