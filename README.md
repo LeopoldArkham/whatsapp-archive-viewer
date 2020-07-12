@@ -1,4 +1,4 @@
-# whatsapp-archive-viewer
+# Whatsapp Archive Viewer
 Web application for conveniently viewing exported whatsapp archives
 
 
