@@ -103,12 +103,12 @@ const Message = ({
   );
 }
 
-const Body = ({ chat, sender1, swapSides, limitRendering }) => {
+const Body = ({ chat, sender1, swapSides, useRenderLimit }) => {
 
   if (chat == null) return null;
 
   let prevMessage = chat[1];
-  const list = limitRendering ? chat.slice(0, THRESHOLD) : chat;
+  const list = useRenderLimit ? chat.slice(0, THRESHOLD) : chat;
 
   return (
     <Pane width="1200px" margin="auto" paddingTop="70px" zIndex="0">

@@ -8,7 +8,7 @@ import Header from './Header';
 import Body from './Body';
 
 
-function processChat() {
+function processChat(raw) {
   const regex = /(\d{1,2}\/\d{1,2}\/\d{1,2}), (\d{2}:\d{2}) - ([^:\n\r]+): /g;
   const split = raw.split(regex);
 
@@ -67,24 +67,20 @@ const App = () => {
   const [ sender1, setSender1 ] = useState(null);
 
   const handleChatUploaded = (raw) => {
-  const processed = processChat(raw);
-  
-  // Arbitrarily select one sender to be sender 1
-  // @todo: Handle group chats
-  const sender1 = processed[1].author;
+    const processed = processChat(raw);
+    const sender1 = processed[1].author;
 
-  setSender1(sender1);
-  setChat(processed);
-  setTimeout(() => {
-    setUseRenderLimit(false);
-  }, 500);
+    setSender1(sender1);
+    setChat(processed);
 
-  return { useThreshold, processChat };
-  }
+    setTimeout(() => {
+      setUseRenderLimit(false);
+    }, 500);
+  };
 
   return (
     <div>
-      <Header processChat={processChat} setSwapSides={setSwapSides} chatLoaded={chat != null} />
+      <Header handleChatUploaded={handleChatUploaded} setSwapSides={setSwapSides} chatLoaded={chat != null} />
       <Body chat={chat} sender1={sender1} swapSides={swapSides} useRenderLimit={useRenderLimit} />
     </div >
   );

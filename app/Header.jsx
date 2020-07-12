@@ -17,12 +17,12 @@ const styles = {
 }
 
 
-const Header = ({ processChat, setSwapSides, chatLoaded }) => {
+const Header = ({ handleChatUploaded, setSwapSides, chatLoaded }) => {
   let reader;
 
   const handleFileRead = () => {
     const content = reader.result;
-    processChat(content);
+    handleChatUploaded(content);
   }
   
   const handleFileChosen = (e) => {
