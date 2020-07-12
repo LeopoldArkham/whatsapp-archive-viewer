@@ -33,7 +33,7 @@ function processChat(raw) {
    */
   // todo: Could just be the date
   let prevMessage = grouped[0];
-  const withDates = grouped.reduce((acc, message) => {
+  const processed = grouped.reduce((acc, message) => {
     const prevDate = dayjs(prevMessage[0]);
     const curDate = dayjs(message[0]);
     const isSameDay = prevDate.isSame(curDate, 'day');
@@ -48,30 +48,49 @@ function processChat(raw) {
     prevMessage = message;
 
     if (isSameDay) {
-      return [...acc, messageObject];
+      return {
+        messages: [...acc.messages, messageObject],
+        senders: {
+          ...acc.senders,
+          [messageObject.author]: (acc.senders[messageObject.author] || 0) + 1,
+        },
+      }
     }
     else {
       const dateObject = { _type: 'date', date: dayjs(message[0]).format('MMM Do YYYY') };
-      return [ ...acc, dateObject, messageObject ];
+      
+      return {
+        messages: [ ...acc.messages, dateObject, messageObject ],
+        senders: {
+          ...acc.senders,
+          [messageObject.author]: (acc.senders[messageObject.author] || 0) + 1,
+        }
+      };
     }
-  }, [initialDate]);
+  }, { messages: [initialDate], senders: {} });
 
-  return withDates;
+  return processed;
 }
 
 
 const App = () => {
+  // Data
   const [ chat, setChat ] = useState(null);
+  const [ isGroupChat, setIsGroupChat ] = useState(null)
+  const [ sender1, setSender1 ] = useState(null);
+  
+  // UI
   const [ useRenderLimit, setUseRenderLimit ] = useState(true);
   const [ swapSides, setSwapSides ] = useState(false);
-  const [ sender1, setSender1 ] = useState(null);
 
   const handleChatUploaded = (raw) => {
-    const processed = processChat(raw);
-    const sender1 = processed[1].author;
+    const { messages, senders } = processChat(raw);
+    console.log(senders);
+    const sender1 = Object.keys(senders)[0];
 
     setSender1(sender1);
-    setChat(processed);
+    setChat(messages);
+    setIsGroupChat(Object.keys(senders).length > 2)
 
     setTimeout(() => {
       setUseRenderLimit(false);
