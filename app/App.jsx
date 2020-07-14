@@ -12,8 +12,10 @@ function processChat(raw) {
   const regex = /(\d{1,2}\/\d{1,2}\/\d{1,2}), (\d{2}:\d{2}) - ([^:\n\r]+): /g;
   const split = raw.split(regex);
 
+  console.log('Here:', split.slice(0, 10));
+
   // If the chat starts with the encryption disclaimer, we remove it.
-  const removeFirst = split[0].includes("Messages to this chat and calls are now secured with end-to-end encryption");
+  const removeFirst = split[0].includes("Messages to this chat and calls are now secured with end-to-end encryption") || split[0] === '';
   const parsed = removeFirst ? split.slice(1) : split;
 
   // Grouping by 4 creates sub-arrays of [date, day, author, message]
@@ -85,7 +87,6 @@ const App = () => {
 
   const handleChatUploaded = (raw) => {
     const { messages, senders } = processChat(raw);
-    console.log(senders);
     const sender1 = Object.keys(senders)[0];
 
     setSender1(sender1);
