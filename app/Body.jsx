@@ -6,7 +6,6 @@ import v4 from 'uuid/v4';
 const THRESHOLD = 100;
 
 const styles = {
-
   message: css`
     position: relative;
     padding: 8px;
@@ -75,6 +74,9 @@ const styles = {
     font-size: 0.9em;
     color: grey;
   `,
+  author: css`
+    font-weight: bold;
+  `,
 };
 
 const Message = ({
@@ -83,8 +85,9 @@ const Message = ({
   isSender1,
   swapSides,
   showTick,
+  author,
+  senders,
 }) => {
-
   return (
     <div className={cx(
       styles.message,
@@ -95,6 +98,7 @@ const Message = ({
         [styles.padRight]: message.length <= 115,
       }
     )}>
+      {isSender1 ? null : <div className={styles.author} style={{ color: senders[author].color}}>{author}</div>}
       {message}
       <div className={styles.timeSent}>
         {time}
@@ -103,7 +107,7 @@ const Message = ({
   );
 }
 
-const Body = ({ chat, sender1, swapSides, useRenderLimit }) => {
+const Body = ({ chat, sender1, swapSides, useRenderLimit, senders }) => {
 
   if (chat == null) return null;
 
@@ -137,7 +141,9 @@ const Body = ({ chat, sender1, swapSides, useRenderLimit }) => {
               key={v4()}
               time={time}
               message={message}
+              senders={senders}
               isSender1={author === sender1}
+              author={author}
               swapSides={swapSides}
               showTick={isFirstOfGroup}
             />

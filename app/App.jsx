@@ -6,13 +6,12 @@ dayjs.extend(advancedFormat);
 
 import Header from './Header';
 import Body from './Body';
+import { COLORS } from './colors';
 
 
 function processChat(raw) {
   const regex = /(\d{1,2}\/\d{1,2}\/\d{1,2}), (\d{2}:\d{2}) - ([^:\n\r]+): /g;
   const split = raw.split(regex);
-
-  console.log('Here:', split.slice(0, 10));
 
   // If the chat starts with the encryption disclaimer, we remove it.
   const removeFirst = split[0].includes("Messages to this chat and calls are now secured with end-to-end encryption") || split[0] === '';
@@ -71,7 +70,15 @@ function processChat(raw) {
     }
   }, { messages: [initialDate], senders: {} });
 
-  return processed;
+  console.log(processed.senders)
+
+  const sendersWithColors = Object.entries(processed.senders).reduce((memo, [sender, messageCount], i) => {
+    return {...memo, [sender]: { color: COLORS[i % COLORS.length], count: messageCount } }
+  }, {})
+
+  console.log(sendersWithColors);
+
+  return { messages: processed.messages, senders: sendersWithColors };
 }
 
 
@@ -80,6 +87,7 @@ const App = () => {
   const [ chat, setChat ] = useState(null);
   const [ isGroupChat, setIsGroupChat ] = useState(null)
   const [ sender1, setSender1 ] = useState(null);
+  const [ senders, setSenders ] = useState(null);
   
   // UI
   const [ useRenderLimit, setUseRenderLimit ] = useState(true);
@@ -89,6 +97,7 @@ const App = () => {
     const { messages, senders } = processChat(raw);
     const sender1 = Object.keys(senders)[0];
 
+    setSenders(senders);
     setSender1(sender1);
     setChat(messages);
     setIsGroupChat(Object.keys(senders).length > 2)
@@ -101,7 +110,7 @@ const App = () => {
   return (
     <div>
       <Header handleChatUploaded={handleChatUploaded} setSwapSides={setSwapSides} chatLoaded={chat != null} />
-      <Body chat={chat} sender1={sender1} swapSides={swapSides} useRenderLimit={useRenderLimit} />
+      <Body senders={senders} chat={chat} sender1={sender1} swapSides={swapSides} useRenderLimit={useRenderLimit} />
     </div >
   );
 }
