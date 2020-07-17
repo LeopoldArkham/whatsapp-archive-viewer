@@ -85,8 +85,8 @@ function processChat(raw) {
 const App = () => {
   // Data
   const [ chat, setChat ] = useState(null);
-  const [ isGroupChat, setIsGroupChat ] = useState(null)
-  const [ sender1, setSender1 ] = useState(null);
+  const [ isGroupChat, setIsGroupChat ] = useState(null);
+  const [ greenSender, setGreenSender] = useState(null);
   const [ senders, setSenders ] = useState(null);
   
   // UI
@@ -95,10 +95,10 @@ const App = () => {
 
   const handleChatUploaded = (raw) => {
     const { messages, senders } = processChat(raw);
-    const sender1 = Object.keys(senders)[0];
+    const greenSender = Object.keys(senders)[0];
 
     setSenders(senders);
-    setSender1(sender1);
+    setGreenSender(greenSender);
     setChat(messages);
     setIsGroupChat(Object.keys(senders).length > 2)
 
@@ -107,10 +107,31 @@ const App = () => {
     }, 500);
   };
 
+  const handleChangeGreenSender = (newSender) => {
+    setUseRenderLimit(true);
+    setGreenSender(newSender);
+
+    setTimeout(() => {
+      setUseRenderLimit(false);
+    }, 500);
+  }
+
   return (
     <div>
-      <Header handleChatUploaded={handleChatUploaded} setSwapSides={setSwapSides} chatLoaded={chat != null} />
-      <Body senders={senders} chat={chat} sender1={sender1} swapSides={swapSides} useRenderLimit={useRenderLimit} />
+      <Header
+        handleChatUploaded={handleChatUploaded}
+        handleChangeGreenSender={handleChangeGreenSender}
+        greenSender={greenSender}
+        senders={senders}
+        chatLoaded={chat != null}
+      />
+      <Body
+        senders={senders}
+        chat={chat}
+        greenSender={greenSender}
+        swapSides={swapSides}
+        useRenderLimit={useRenderLimit}
+      />
     </div >
   );
 }

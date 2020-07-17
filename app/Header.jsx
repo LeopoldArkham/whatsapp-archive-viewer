@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from 'emotion'
-import { Pane, Heading, FilePicker, Button, majorScale } from 'evergreen-ui';
+import { Pane, Heading, FilePicker, Button, majorScale, Select } from 'evergreen-ui';
 
 
 const styles = {
@@ -17,7 +17,32 @@ const styles = {
 }
 
 
-const Header = ({ handleChatUploaded, setSwapSides, chatLoaded }) => {
+const GreenSenderSelector = ({ senders, greenSender, handleChangeGreenSender }) => {
+  if (senders.length === 2) {
+    const onClick = () => {
+      const otherSender = Object.keys(senders).find(s => s !== greenSender);
+      handleChangeGreenSender(otherSender);
+    }
+
+    return (
+      <Button iconBefore="swap-horizontal" onClick={onClick} disabled={!chatLoaded}>
+        Swap sides
+      </Button>
+    );
+  }
+  else {
+    return (
+      <div style={{ width: "170px" }}>
+        <Select onChange={(e) => handleChangeGreenSender(event.target.value)}>
+          {Object.keys(senders).map(s => <option value={s}>{s}</option>)}
+        </Select>
+      </div>
+    );
+  }
+}
+
+
+const Header = ({ handleChatUploaded, setSwapSides, chatLoaded, senders, greenSender, handleChangeGreenSender }) => {
   let reader;
 
   const handleFileRead = () => {
@@ -35,9 +60,12 @@ const Header = ({ handleChatUploaded, setSwapSides, chatLoaded }) => {
   return (
     <Pane display="flex" className={styles.header}>
       <Heading size={700}>Whatsapp Archive Viewer</Heading>
-      <Button iconBefore="swap-horizontal" onClick={() => setSwapSides(prevValue => !prevValue)} disabled={!chatLoaded}>
-        Swap sides
-      </Button>
+      { chatLoaded && 
+      <GreenSenderSelector
+        greenSender={greenSender}
+        senders={senders}
+        handleChangeGreenSender={handleChangeGreenSender}
+      />}
       <FilePicker
         multiple={false}
         placeholder="Upload a WhatsApp archive file"

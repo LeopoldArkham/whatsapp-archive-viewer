@@ -9,16 +9,21 @@ const styles = {
   message: css`
     position: relative;
     padding: 8px;
-    margin: 10px 10px 10px auto;
-    background-color: #DCF8C6;
+    margin: 10px auto 10px 10px;
+    background-color: white;
     font-family: "Segoe UI";
     max-width: 66%;
     width: fit-content;
     border-radius: 10px 10px 10px 10px;
     box-shadow: 0px 1px 0px 0px rgba(184,184,184,0.5);
   `,
-  bubbleTickBaseMessage: css`
+  bubbleTickGreenSender: css`
     border-radius: 10px 0px 10px 10px;
+
+    /* Override the arrow inherited from the base message class */
+    &:before {
+      content: none;
+    }
 
     &:after {
       content: "";
@@ -29,13 +34,8 @@ const styles = {
       top: 0;
     }
   `,
-  bubbleTickThisSender: css`
+  bubbleTickBaseMessage: css`
     border-radius: 0px 10px 10px 10px;
-
-    /* Override the arrow inherited from the base message class */
-    &:after {
-      content: none;
-    }
 
     &:before {
       content: "";
@@ -63,8 +63,8 @@ const styles = {
     padding-right: 60px 
   `,
   thisSender: css`
-    margin: 10px auto 10px 10px;
-    background: white;
+    margin: 10px 10px 10px auto;
+    background: #DCF8C6;
   `,
   timeSent: css`
     position: absolute;
@@ -82,7 +82,7 @@ const styles = {
 const Message = ({
   time,
   message,
-  isSender1,
+  isGreenSender,
   swapSides,
   showTick,
   author,
@@ -92,13 +92,13 @@ const Message = ({
     <div className={cx(
       styles.message,
       {
-        [styles.thisSender]: isSender1 ^ swapSides,
+        [styles.thisSender]: isGreenSender ^ swapSides,
         [styles.bubbleTickBaseMessage]: showTick,
-        [styles.bubbleTickThisSender]: showTick && (isSender1 ^ swapSides),
+        [styles.bubbleTickGreenSender]: showTick && (isGreenSender ^ swapSides),
         [styles.padRight]: message.length <= 115,
       }
     )}>
-      {isSender1 ? null : <div className={styles.author} style={{ color: senders[author].color}}>{author}</div>}
+      {isGreenSender ? null : <div className={styles.author} style={{ color: senders[author].color}}>{author}</div>}
       {message}
       <div className={styles.timeSent}>
         {time}
@@ -107,7 +107,7 @@ const Message = ({
   );
 }
 
-const Body = ({ chat, sender1, swapSides, useRenderLimit, senders }) => {
+const Body = ({ chat, greenSender, swapSides, useRenderLimit, senders }) => {
 
   if (chat == null) return null;
 
@@ -142,7 +142,7 @@ const Body = ({ chat, sender1, swapSides, useRenderLimit, senders }) => {
               time={time}
               message={message}
               senders={senders}
-              isSender1={author === sender1}
+              isGreenSender={author === greenSender}
               author={author}
               swapSides={swapSides}
               showTick={isFirstOfGroup}
