@@ -17,8 +17,8 @@ const styles = {
 }
 
 
-const GreenSenderSelector = ({ senders, greenSender, handleChangeGreenSender }) => {
-  if (senders.length === 2) {
+const GreenSenderSelector = ({ senders, greenSender, handleChangeGreenSender, isGroupChat, chatLoaded }) => {
+  if (! isGroupChat) {
     const onClick = () => {
       const otherSender = Object.keys(senders).find(s => s !== greenSender);
       handleChangeGreenSender(otherSender);
@@ -42,7 +42,7 @@ const GreenSenderSelector = ({ senders, greenSender, handleChangeGreenSender }) 
 }
 
 
-const Header = ({ handleChatUploaded, setSwapSides, chatLoaded, senders, greenSender, handleChangeGreenSender }) => {
+const Header = ({ handleChatUploaded, setSwapSides, chatLoaded, senders, greenSender, handleChangeGreenSender, isGroupChat }) => {
   let reader;
 
   const handleFileRead = () => {
@@ -65,6 +65,8 @@ const Header = ({ handleChatUploaded, setSwapSides, chatLoaded, senders, greenSe
         greenSender={greenSender}
         senders={senders}
         handleChangeGreenSender={handleChangeGreenSender}
+        chatLoaded={chatLoaded}
+        isGroupChat={isGroupChat}
       />}
       <FilePicker
         multiple={false}
