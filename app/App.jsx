@@ -126,6 +126,7 @@ const App = () => {
         greenSender={greenSender}
         senders={senders}
         chatLoaded={chat != null}
+        isGroupChat={isGroupChat}
       />
       <Body
         senders={senders}
@@ -133,6 +134,7 @@ const App = () => {
         greenSender={greenSender}
         swapSides={swapSides}
         useRenderLimit={useRenderLimit}
+        isGroupChat={isGroupChat}
       />
     </div >
   );

@@ -87,6 +87,7 @@ const Message = ({
   showTick,
   author,
   senders,
+  isGroupChat,
 }) => {
   return (
     <div className={cx(
@@ -98,7 +99,7 @@ const Message = ({
         [styles.padRight]: message.length <= 115,
       }
     )}>
-      {isGreenSender ? null : <div className={styles.author} style={{ color: senders[author].color}}>{author}</div>}
+      {isGreenSender || ! isGroupChat ? null : <div className={styles.author} style={{ color: senders[author].color}}>{author}</div>}
       {message}
       <div className={styles.timeSent}>
         {time}
@@ -107,7 +108,7 @@ const Message = ({
   );
 }
 
-const Body = ({ chat, greenSender, swapSides, useRenderLimit, senders }) => {
+const Body = ({ chat, greenSender, swapSides, useRenderLimit, senders, isGroupChat }) => {
 
   if (chat == null) return null;
 
@@ -146,6 +147,7 @@ const Body = ({ chat, greenSender, swapSides, useRenderLimit, senders }) => {
               author={author}
               swapSides={swapSides}
               showTick={isFirstOfGroup}
+              isGroupChat={isGroupChat}
             />
           );
 
