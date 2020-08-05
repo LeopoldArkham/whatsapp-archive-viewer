@@ -94,6 +94,8 @@ const App = () => {
   const [ swapSides, setSwapSides ] = useState(false);
 
   const handleChatUploaded = (raw) => {
+    setChat(null);
+    setUseRenderLimit(true);
     const { messages, senders } = processChat(raw);
     const greenSender = Object.keys(senders)[0];
 
