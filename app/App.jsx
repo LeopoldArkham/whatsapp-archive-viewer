@@ -119,7 +119,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div style={{ height: '100%' }}>
       <Header
         handleChatUploaded={handleChatUploaded}
         handleChangeGreenSender={handleChangeGreenSender}
@@ -135,6 +135,7 @@ const App = () => {
         swapSides={swapSides}
         useRenderLimit={useRenderLimit}
         isGroupChat={isGroupChat}
+        handleChatUploaded={handleChatUploaded}
       />
     </div >
   );
