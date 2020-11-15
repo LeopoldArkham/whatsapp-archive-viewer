@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { css, cx } from 'emotion';
-import { Pane, Autocomplete } from 'evergreen-ui';
+import { Pane, Autocomplete, Heading, Text, FilePicker, Link } from 'evergreen-ui';
 import v4 from 'uuid/v4';
 
 const THRESHOLD = 100;
@@ -79,6 +79,41 @@ const styles = {
   `,
 };
 
+const Placeholder = ({ handleChatUploaded }) => {
+  let reader;
+
+  const handleFileRead = () => {
+    const content = reader.result;
+    handleChatUploaded(content);
+  }
+  
+  const handleFileChosen = (e) => {
+    const file = e[0];
+    reader = new FileReader();
+    reader.onloadend = handleFileRead;
+    reader.readAsText(file);
+  }
+
+  return (
+    <Pane width="1200px" height="100%" margin="auto" paddingTop="70px" zIndex="0">
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+        <Heading size={700}>Whatsapp Archive Viewer</Heading>
+        <Text marginTop="8px">
+          Choose a Whatsapp archive (.txt) to upload it.
+        </Text>
+        <Link target="_blank" marginBottom="16px" href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history/?lang=en">
+          How do I export an archive from Whatsapp?
+        </Link>
+        <FilePicker
+          multiple={false}
+          placeholder="Upload a WhatsApp archive file"
+          accept=".txt"
+          onChange={handleFileChosen} />
+      </div>
+    </Pane>
+  );
+}
+
 const Message = ({
   time,
   message,
@@ -108,10 +143,9 @@ const Message = ({
   );
 }
 
-const Body = ({ chat, greenSender, swapSides, useRenderLimit, senders, isGroupChat }) => {
-
-  if (chat == null) return null;
-
+const Body = ({ chat, greenSender, swapSides, useRenderLimit, senders, isGroupChat, handleChatUploaded }) => {
+  if (chat == null) return <Placeholder handleChatUploaded={handleChatUploaded}/>
+  
   let prevMessage = chat[1];
   const list = useRenderLimit ? chat.slice(0, THRESHOLD) : chat;
 
