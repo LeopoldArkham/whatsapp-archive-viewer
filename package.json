@@ -38,7 +38,7 @@
     "dayjs": "^1.8.32",
     "dotenv": "^8.2.0",
     "emotion": "^10.0.27",
-    "evergreen-ui": "^4.29.1",
+    "evergreen-ui": "^5.1.2",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "lodash.chunk": "^4.2.0",
     "react": "^16.13.1",

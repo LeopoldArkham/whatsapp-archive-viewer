@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { css } from 'emotion'
-import { Pane, Heading, FilePicker, Button, majorScale, Select } from 'evergreen-ui';
+import { Pane, Heading, FilePicker, Button, majorScale, Select, Avatar, Text } from 'evergreen-ui';
 
 
 const styles = {
@@ -19,15 +19,21 @@ const styles = {
 
 const GreenSenderSelector = ({ senders, greenSender, handleChangeGreenSender, isGroupChat, chatLoaded }) => {
   if (! isGroupChat) {
+    const otherSender = Object.keys(senders).find(s => s !== greenSender);
+    console.log(greenSender, otherSender);
+    
     const onClick = () => {
-      const otherSender = Object.keys(senders).find(s => s !== greenSender);
       handleChangeGreenSender(otherSender);
     }
 
     return (
-      <Button iconBefore="swap-horizontal" onClick={onClick} disabled={!chatLoaded}>
-        Swap sides
-      </Button>
+      <Fragment>
+        <Avatar isSolid name={otherSender} size={32} /> <Text>{otherSender}</Text>
+        <Button iconBefore="swap-horizontal" onClick={() => handleChangeGreenSender(otherSender)} disabled={!chatLoaded}>
+          Swap sides
+        </Button>
+        <Avatar isSolid name={greenSender} size={32} /> <Text>{greenSender}</Text>
+      </Fragment>
     );
   }
   else {
