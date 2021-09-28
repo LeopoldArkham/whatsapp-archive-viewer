@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const initialMessage = require('initial-webpack-message');
 require('dotenv').config();
@@ -21,7 +22,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist/'),
     publicPath: '/dist/',
-    filename: 'bundle.js'
+    filename: 'bundle.js',
   },
   devServer: {
     contentBase: path.join(__dirname, 'app/'),
@@ -31,6 +32,10 @@ module.exports = {
     quiet: true,
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      tempalte: 'app/index.html',
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new FriendlyErrorsWebpackPlugin({
       clearConsole: true,
