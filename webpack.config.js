@@ -5,19 +5,21 @@ const initialMessage = require('initial-webpack-message');
 require('dotenv').config();
 
 module.exports = {
-  entry: './app/index.js',
+  entry: './app/index.ts',
   mode: 'development',
+  devtool: 'source-map',
   module: {
     rules: [
+      { test: /\.tsx?$/, loader: "ts-loader" },
       {
         test: /\.(js|jsx)$/,
         exclude: /(node_modules)/,
-        loader: 'babel-loader',
+        loader: 'source-map-loader',
         options: { presets: ['@babel/env'] },
       },
     ],
   },
-  resolve: { extensions: ['*', '.js', '.jsx'] },
+  resolve: { extensions: ['*', '.js', '.jsx', '.ts', '.tsx'] },
   output: {
     path: path.resolve(__dirname, 'dist/'),
     publicPath: '/dist/',
