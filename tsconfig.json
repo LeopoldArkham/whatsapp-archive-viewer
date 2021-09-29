@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "jsx": "react",
+    "module": "CommonJS",
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es5"
+  },
+  "include": ["./app/**/*"]
+}
