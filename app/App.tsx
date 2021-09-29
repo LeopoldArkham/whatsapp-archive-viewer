@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React, { useState } from 'react';
 import chunk from 'lodash.chunk';
 import dayjs from 'dayjs';
@@ -16,9 +18,10 @@ interface Sender {
   messageCount: number;
 }
 
-function processChat(
-  raw: string
-): { messages: Array<Message>; senders: Array<Sender> } {
+function processChat(raw: string): {
+  messages: Array<Message>;
+  senders: Array<Sender>;
+} {
   const regex = /(\d{1,2}\/\d{1,2}\/\d{1,2}), (\d{2}:\d{2}) - ([^:\n\r]+): /g;
   const split = raw.split(regex);
 
