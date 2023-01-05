@@ -1,5 +1,5 @@
 # Whatsapp Archive Viewer
-Web application for conveniently viewing exported whatsapp archives
+React web application for conveniently viewing exported whatsapp archives
 
 
 Under development
