@@ -41,7 +41,7 @@
     "emotion": "^10.0.27",
     "evergreen-ui": "^5.1.2",
     "friendly-errors-webpack-plugin": "^1.7.0",
-    "html-webpack-plugin": "^3.0.0",
+    "html-webpack-plugin": "^5.5.0",
     "lodash.chunk": "^4.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
