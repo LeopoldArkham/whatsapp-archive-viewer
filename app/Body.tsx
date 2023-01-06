@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { css, cx } from 'emotion';
-import {
-  Pane,
-  Autocomplete,
-  Heading,
-  Text,
-  FilePicker,
-  Link,
-} from 'evergreen-ui';
+import { css, cx } from '@emotion/css';
 import v4 from 'uuid/v4';
 
 const THRESHOLD = 100;
@@ -102,38 +94,30 @@ const Placeholder = ({ handleChatUploaded }) => {
   };
 
   return (
-    <Pane
-      width="1200px"
-      height="100%"
-      margin="auto"
-      paddingTop="70px"
-      zIndex={0}>
-      <div
-        style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Heading size={700}>Whatsapp Archive Viewer</Heading>
-        <Text marginTop="8px">
-          Choose a Whatsapp archive (.txt) to upload it.
-        </Text>
-        <Link
-          target="_blank"
-          marginBottom="16px"
-          href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history/?lang=en">
-          How do I export an archive from Whatsapp?
-        </Link>
-        <FilePicker
-          multiple={false}
-          placeholder="Upload a WhatsApp archive file"
-          accept=".txt"
-          onChange={handleFileChosen}
-        />
-      </div>
-    </Pane>
+    <div
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <h2 size={700}>Whatsapp Archive Viewer</h2>
+      <p>Choose a Whatsapp archive (.txt) to upload it.</p>
+      <a
+        target="_blank"
+        marginBottom="16px"
+        href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history/?lang=en">
+        How do I export an archive from Whatsapp?
+      </a>
+      <input
+        type="file"
+        multiple={false}
+        placeholder="Upload a WhatsApp archive file"
+        accept=".txt"
+        onChange={handleFileChosen}
+      />
+    </div>
   );
 };
 
@@ -180,7 +164,7 @@ const Body = ({
   const list = useRenderLimit ? chat.slice(0, THRESHOLD) : chat;
 
   return (
-    <Pane width="1200px" margin="auto" paddingTop="70px" zIndex={0}>
+    <div>
       {list.map((object) => {
         if (object._type === 'date') {
           return <div className={styles.dateStamp}>{object.date}</div>;
@@ -194,6 +178,7 @@ const Body = ({
 
           return (
             <Message
+              // @ts-ignore
               key={v4()}
               time={time}
               message={message}
@@ -206,7 +191,7 @@ const Body = ({
           );
         }
       })}
-    </Pane>
+    </div>
   );
 };
 

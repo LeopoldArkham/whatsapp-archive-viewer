@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import chunk from 'lodash.chunk';
 import dayjs from 'dayjs';
@@ -91,8 +89,6 @@ function processChat(raw: string): {
     { messages: [initialDate], senders: {} }
   );
 
-  console.log(processed.senders);
-
   const sendersWithColors = Object.entries(processed.senders).reduce(
     (memo, [sender, messageCount], i) => {
       return {
@@ -103,8 +99,7 @@ function processChat(raw: string): {
     {}
   );
 
-  console.log(sendersWithColors);
-
+  // @ts-ignore
   return { messages: processed.messages, senders: sendersWithColors };
 }
 

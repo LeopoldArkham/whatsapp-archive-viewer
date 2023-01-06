@@ -1,15 +1,5 @@
 import React, { Fragment } from 'react';
-import { css } from 'emotion';
-import {
-  Pane,
-  Heading,
-  FilePicker,
-  Button,
-  majorScale,
-  Select,
-  Avatar,
-  Text,
-} from 'evergreen-ui';
+import { css } from '@emotion/css';
 
 const styles = {
   header: css`
@@ -20,7 +10,7 @@ const styles = {
     position: fixed;
     top: 0;
     width: 100%;
-    padding: ${majorScale(2)}px;
+    padding: 12px;
   `,
 };
 
@@ -33,29 +23,28 @@ const GreenSenderSelector = ({
 }) => {
   if (!isGroupChat) {
     const otherSender = Object.keys(senders).find((s) => s !== greenSender);
-    console.log(greenSender, otherSender);
 
     return (
       <Fragment>
-        <Avatar isSolid name={otherSender} size={32} />{' '}
-        <Text>{otherSender}</Text>
-        <Button
+        {/* <Avatar isSolid name={otherSender} size={32} />{' '} */}
+        <p>{otherSender}</p>
+        <button
           onClick={() => handleChangeGreenSender(otherSender)}
           disabled={!chatLoaded}>
           Swap sides
-        </Button>
-        <Avatar isSolid name={greenSender} size={32} />{' '}
-        <Text>{greenSender}</Text>
+        </button>
+        {/* <Avatar isSolid name={greenSender} size={32} />{' '} */}
+        <p>{greenSender}</p>
       </Fragment>
     );
   } else {
     return (
       <div style={{ width: '170px' }}>
-        <Select onChange={(e) => handleChangeGreenSender(e.target.value)}>
+        <select onChange={(e) => handleChangeGreenSender(e.target.value)}>
           {Object.keys(senders).map((s) => (
             <option value={s}>{s}</option>
           ))}
-        </Select>
+        </select>
       </div>
     );
   }
@@ -84,8 +73,8 @@ const Header = ({
   };
 
   return (
-    <Pane display="flex" className={styles.header}>
-      <Heading size={700}>Whatsapp Archive Viewer</Heading>
+    <div className={styles.header}>
+      <h2 size={700}>Whatsapp Archive Viewer</h2>
       {chatLoaded && (
         <GreenSenderSelector
           greenSender={greenSender}
@@ -95,13 +84,14 @@ const Header = ({
           isGroupChat={isGroupChat}
         />
       )}
-      <FilePicker
+      <input
+        type="file"
         multiple={false}
         placeholder="Upload a WhatsApp archive file"
         accept=".txt"
         onChange={handleFileChosen}
       />
-    </Pane>
+    </div>
   );
 };
 
