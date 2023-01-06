@@ -23,16 +23,7 @@ module.exports = {
         use: [
           'style-loader',
           'css-loader',
-          {
-            loader: 'postcss-loader',
-            options: {
-              ident: 'postcss',
-              plugins: [
-                require('tailwindcss'),
-                require('autoprefixer'),
-              ],
-            },
-          },
+          'postcss-loader',
         ],
       },
     ],
