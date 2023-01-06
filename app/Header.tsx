@@ -74,7 +74,9 @@ const Header = ({
 
   return (
     <div className={styles.header}>
-      <h2 size={700}>Whatsapp Archive Viewer</h2>
+      <h2 className="text-green-500" size={700}>
+        Whatsapp Archive Viewer
+      </h2>
       {chatLoaded && (
         <GreenSenderSelector
           greenSender={greenSender}

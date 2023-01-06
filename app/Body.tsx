@@ -106,7 +106,6 @@ const Placeholder = ({ handleChatUploaded }) => {
       <p>Choose a Whatsapp archive (.txt) to upload it.</p>
       <a
         target="_blank"
-        marginBottom="16px"
         href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history/?lang=en">
         How do I export an archive from Whatsapp?
       </a>

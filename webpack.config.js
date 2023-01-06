@@ -6,7 +6,7 @@ const initialMessage = require('initial-webpack-message');
 require('dotenv').config();
 
 module.exports = {
-  entry: './app/index.ts',
+  entry: './app/index.tsx',
   mode: 'development',
   devtool: 'source-map',
   module: {
