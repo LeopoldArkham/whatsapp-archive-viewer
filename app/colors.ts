@@ -1,4 +1,4 @@
-export type Color = string;
+import { Color } from './types';
 
 export const COLORS: Array<Color> = [
   '#00ffff', // aqua

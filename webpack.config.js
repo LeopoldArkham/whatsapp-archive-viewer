@@ -47,6 +47,9 @@ module.exports = {
       filename: 'index.html',
       template: 'app/index.html',
     }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env)
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new FriendlyErrorsWebpackPlugin({
       clearConsole: true,

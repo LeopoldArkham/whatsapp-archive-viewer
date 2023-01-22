@@ -1,92 +1,65 @@
-import React, { useState } from 'react';
-import chunk from 'lodash.chunk';
+import React, { useState, createContext, useContext } from 'react';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 dayjs.extend(advancedFormat);
 
 import Header from './Header';
 import Body from './Body';
-import { Color, COLORS } from './colors';
-
-type Message = any;
-
-interface Sender {
-  name: string;
-  color: Color;
-  messageCount: number;
-}
+import { COLORS } from './colors';
+import { ChatEntry, Color, DateMarker, Message, Sender } from './types';
+import { messageRegex } from './regex';
+import testChat from './testChat';
 
 function processChat(raw: string): {
-  messages: Array<Message>;
-  senders: Array<Sender>;
+  messages: Array<ChatEntry>;
+  senders: Record<string, { color: Color; count: number }>;
 } {
-  const regex = /(\d{1,2}\/\d{1,2}\/\d{1,2}), (\d{2}:\d{2}) - ([^:\n\r]+): /g;
-  const split = raw.split(regex);
-
-  // If the chat starts with the encryption disclaimer, we remove it.
-  const removeFirst =
-    split[0].includes(
-      'Messages to this chat and calls are now secured with end-to-end encryption'
-    ) || split[0] === '';
-  const parsed = removeFirst ? split.slice(1) : split;
-
-  // Grouping by 4 creates sub-arrays of [date, day, author, message]
-  const grouped = chunk(parsed, 4);
+  const parsed = Array.from(raw.matchAll(messageRegex));
+  console.log(parsed);
 
   // Get and parse the date of the first message
-  const firstMessageDate = grouped[0][0];
-  const initialDate = {
-    _type: 'date',
-    date: dayjs(firstMessageDate).format('MMM Do YYYY'),
-  };
+  const firstMessageDate = parsed[0].groups.date;
+  const initialDate: ChatEntry = dayjs(firstMessageDate).format('MMM Do YYYY');
 
   /**
-   * Iterate through all the sub-arrays, turning them into message objects,
+   * Iterate through all the sub-arrays, turning them into `Message`,
    * and inserting a date stamp whenever we go from one day to the next.
    */
   // todo: Could just be the date
-  let prevMessage = grouped[0];
-  const processed = grouped.reduce(
-    (acc, message) => {
-      const prevDate = dayjs(prevMessage[0]);
-      const curDate = dayjs(message[0]);
+  let previousEntry = parsed[0];
+  const processed: {
+    entries: Array<ChatEntry>;
+    senders: Record<string, number>;
+  } = parsed.reduce(
+    (acc, entry) => {
+      const { date, time, author, text } = entry.groups;
+
+      const prevDate = dayjs(previousEntry.groups.date, 'MM/DD/YY');
+      const curDate = dayjs(entry.groups.date, 'MM/DD/YY');
       const isSameDay = prevDate.isSame(curDate, 'day');
 
-      const messageObject = {
-        _type: 'message',
-        time: message[1],
-        author: message[2],
-        message: message[3],
+      previousEntry = entry;
+
+      const message = { date, time, author, text };
+      // todo: avoid recomputing on every iteration
+      const dateMarker = dayjs(date).format('MMM Do YYYY');
+
+      const test = {
+        entries: [
+          ...acc.entries,
+          ...(isSameDay ? [message] : [dateMarker, message]),
+        ],
+        senders: {
+          ...acc.senders,
+          [message.author]: (acc.senders[message.author] || 0) + 1,
+        },
       };
-
-      prevMessage = message;
-
-      if (isSameDay) {
-        return {
-          messages: [...acc.messages, messageObject],
-          senders: {
-            ...acc.senders,
-            [messageObject.author]:
-              (acc.senders[messageObject.author] || 0) + 1,
-          },
-        };
-      } else {
-        const dateObject = {
-          _type: 'date',
-          date: dayjs(message[0]).format('MMM Do YYYY'),
-        };
-
-        return {
-          messages: [...acc.messages, dateObject, messageObject],
-          senders: {
-            ...acc.senders,
-            [messageObject.author]:
-              (acc.senders[messageObject.author] || 0) + 1,
-          },
-        };
-      }
+      return test;
     },
-    { messages: [initialDate], senders: {} }
+    { entries: [initialDate], senders: {} } as {
+      entries: Array<ChatEntry>;
+      senders: Record<string, number>;
+    }
   );
 
   const sendersWithColors = Object.entries(processed.senders).reduce(
@@ -96,19 +69,36 @@ function processChat(raw: string): {
         [sender]: { color: COLORS[i % COLORS.length], count: messageCount },
       };
     },
-    {}
+    {} as Record<string, { color: Color; count: number }>
   );
 
-  // @ts-ignore
-  return { messages: processed.messages, senders: sendersWithColors };
+  return { messages: processed.entries, senders: sendersWithColors };
 }
 
-const App = () => {
+const GlobalAppContext = createContext<{
+  greenSender: string | null;
+}>({ greenSender: null });
+
+export function useGlobalAppState() {
+  return useContext(GlobalAppContext);
+}
+
+export const App = () => {
   // Data
-  const [chat, setChat] = useState<Array<Message>>(null);
-  const [isGroupChat, setIsGroupChat] = useState<Boolean>(null);
-  const [greenSender, setGreenSender] = useState<Sender>(null);
-  const [senders, setSenders] = useState<Array<Sender>>(null);
+  const [chat, setChat] = useState<Array<ChatEntry>>(
+    process.env.APP_ENV === 'development' ? testChat : null
+  );
+  console.log(chat);
+  // todo: should this just be computed?
+  const [isGroupChat, setIsGroupChat] = useState<Boolean>(
+    process.env.APP_ENV === 'development' ? false : null
+  );
+  const [greenSender, setGreenSender] = useState<Sender>(
+    process.env.APP_ENV === 'development' ? 'Me' : null
+  );
+  const [senders, setSenders] = useState<Array<Sender>>(
+    process.env.APP_ENV === 'development' ? ['Me', 'Her'] : null
+  );
 
   // UI
   const [useRenderLimit, setUseRenderLimit] = useState(true);
@@ -140,25 +130,25 @@ const App = () => {
   };
 
   return (
-    <div style={{ height: '100%' }}>
-      <Header
-        handleChatUploaded={handleChatUploaded}
-        handleChangeGreenSender={handleChangeGreenSender}
-        greenSender={greenSender}
-        senders={senders}
-        chatLoaded={chat != null}
-        isGroupChat={isGroupChat}
-      />
-      <Body
-        senders={senders}
-        chat={chat}
-        greenSender={greenSender}
-        useRenderLimit={useRenderLimit}
-        isGroupChat={isGroupChat}
-        handleChatUploaded={handleChatUploaded}
-      />
-    </div>
+    <GlobalAppContext.Provider value={{ greenSender }}>
+      <div className="h-full">
+        <Header
+          senders={senders}
+          greenSender={greenSender}
+          isChatLoaded={chat != null}
+          isGroupChat={isGroupChat}
+          handleChatUploaded={handleChatUploaded}
+          handleChangeGreenSender={handleChangeGreenSender}
+        />
+        <Body
+          chat={chat}
+          senders={senders}
+          greenSender={greenSender}
+          isGroupChat={isGroupChat}
+          useRenderLimit={useRenderLimit}
+          handleChatUploaded={handleChatUploaded}
+        />
+      </div>
+    </GlobalAppContext.Provider>
   );
 };
-
-export default App;
