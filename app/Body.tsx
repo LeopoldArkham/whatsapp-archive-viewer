@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { css, cx } from '@emotion/css';
-import v4 from 'uuid/v4';
-import { ChatEntry, DateMarker, Message } from './types';
+import { ChatEntry, DateMarker, Message, Sender } from './types';
 import { useGlobalAppState } from './App';
 
 const THRESHOLD = 100;
@@ -33,51 +32,15 @@ const styles = {
   `,
 };
 
-interface PlaceholderProps {
-  handleChatUploaded: (input: string) => void;
-}
-
-const Placeholder = ({ handleChatUploaded }: PlaceholderProps) => {
-  return (
-    <div className="h-full flex flex-col items-center pt-28 bg-slate-800">
-      <h2 className="text-white text-3xl mb-4">Whatsapp Archive Viewer</h2>
-      <p className="text-white">
-        Choose a Whatsapp archive (.txt) to upload it.
-      </p>
-      <p className="text-white mt-2 p-4 shadow-inner bg-slate-900 rounded text-center max-w-[30%]">
-        The content of your chat will be processed entirely in your browser, on
-        your own computer. At no point is any information about you or your
-        conversation transferred or saved anywhere else.
-        <br />
-        <br />
-        This site does not use cookies or local storage.
-      </p>
-      <a
-        className="underline italic text-sky-500 hover:text-sky-300 pt-2 pb-4"
-        target="_blank"
-        href="https://faq.whatsapp.com/android/chats/how-to-save-your-chat-history/?lang=en">
-        How do I export an archive from Whatsapp?
-      </a>
-      {/* The actual label this refers to is the one in the header */}
-      <label
-        htmlFor="file-upload"
-        className="text-slate-200 bg-sky-500  text-l rounded-lg px-3 py-2 cursor-pointer hover:bg-sky-400 hover:file:text-slate-100 transition-all">
-        Choose a file
-      </label>
-    </div>
-  );
-};
-
 interface MessageProps {
   message: Message;
-  senders: unknown;
-  isGroupChat: boolean;
+  senders: Array<Sender>;
   showTick: boolean;
 }
 
-const Message = ({ message, showTick, senders, isGroupChat }: MessageProps) => {
+const Message = ({ message, showTick, senders }: MessageProps) => {
   const { greenSender } = useGlobalAppState();
-  const isGreenSender = message.author === greenSender;
+  const isGreenSender = message.author === greenSender?.name;
 
   return (
     <div
@@ -90,10 +53,13 @@ const Message = ({ message, showTick, senders, isGroupChat }: MessageProps) => {
         showTick ? (isGreenSender ? 'rounded-br-sm' : 'rounded-bl-sm') : null,
         message.text.length <= 115 ? 'pr-12' : ''
       )}>
-      {isGreenSender || !isGroupChat ? null : (
+      {isGreenSender || !(senders.length > 2) ? null : (
         <div
           className={styles.author}
-          style={{ color: senders[message.author].color }}>
+          style={{
+            color: senders.find((author) => author.name === message.author)
+              ?.color,
+          }}>
           {message.author}
         </div>
       )}
@@ -118,30 +84,18 @@ function entryIsDateMarker(entry: ChatEntry): entry is DateMarker {
 
 interface BodyProps {
   chat: Array<ChatEntry>;
-  senders: unknown;
-  greenSender: string;
-  isGroupChat: boolean;
+  senders: Array<Sender>;
+  greenSender: Sender;
   useRenderLimit: boolean;
-  handleChatUploaded: (raw: string) => void;
 }
 
-const Body = ({
-  chat,
-  senders,
-  isGroupChat,
-  useRenderLimit,
-  handleChatUploaded,
-}: BodyProps) => {
-  if (chat == null)
-    return <Placeholder handleChatUploaded={handleChatUploaded} />;
-
+const Body = ({ chat, senders, useRenderLimit }: BodyProps) => {
   const list = useRenderLimit ? chat.slice(0, THRESHOLD) : chat;
 
   return (
-    <div className="bg-slate-800 px-[15vw] pt-24 min-h-full pt-5">
+    <div className="bg-slate-800 px-[15vw] pt-24 min-h-full">
       {list.map((entry, index) => {
         if (entryIsDateMarker(entry)) {
-          return null;
           return (
             <div key={index} className={styles.dateStamp}>
               {entry}
@@ -161,7 +115,6 @@ const Body = ({
               message={message}
               senders={senders}
               showTick={isLastOfGroup}
-              isGroupChat={isGroupChat}
               // @ts-ignore (why tough)
               key={index}
             />

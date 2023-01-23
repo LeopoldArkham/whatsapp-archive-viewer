@@ -16,5 +16,4 @@ export type ChatEntry = Message | DateMarker;
 export interface Sender {
   name: string;
   color: Color;
-  messageCount: number;
 }

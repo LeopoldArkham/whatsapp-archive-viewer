@@ -1,13 +1,11 @@
 import React, { Fragment } from 'react';
+import { Sender } from './types';
 
-const Header = ({
-  handleChatUploaded,
-  isChatLoaded,
-  senders,
-  greenSender,
-  handleChangeGreenSender,
-  isGroupChat,
-}) => {
+interface HeaderProps {
+  handleChatUploaded: (raw: string | ArrayBuffer | null) => void;
+}
+
+const Header = ({ handleChatUploaded }: HeaderProps) => {
   let reader: FileReader;
 
   const handleFileRead = () => {
@@ -15,7 +13,14 @@ const Header = ({
     handleChatUploaded(content);
   };
 
-  const handleFileChosen = (e) => {
+  const handleFileChosen = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files == null) {
+      console.error(
+        'When handling uploaded file, `e.target.files` was null or undefined'
+      );
+      return;
+    }
+
     const file = e.target.files[0];
     reader = new FileReader();
     reader.onloadend = handleFileRead;
