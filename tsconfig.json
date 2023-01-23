@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "esModuleInterop": true,
     "jsx": "react",
     "module": "CommonJS",

@@ -6,7 +6,7 @@ const initialMessage = require('initial-webpack-message');
 require('dotenv').config();
 
 module.exports = {
-  entry: './app/index.ts',
+  entry: './app/index.tsx',
   mode: 'development',
   devtool: 'source-map',
   module: {
@@ -18,6 +18,14 @@ module.exports = {
         loader: 'source-map-loader',
         options: { presets: ['@babel/env'] },
       },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'postcss-loader',
+        ],
+      },
     ],
   },
   resolve: { extensions: ['*', '.js', '.jsx', '.ts', '.tsx'] },
@@ -27,16 +35,20 @@ module.exports = {
     filename: 'bundle.js',
   },
   devServer: {
-    contentBase: path.join(__dirname, 'app/'),
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
     port: process.env.WEBPACK_PORT,
-    publicPath: `http://localhost:${process.env.WEBPACK_PORT}/dist`,
+    // publicPath: `http://localhost:${process.env.WEBPACK_PORT}/dist`,
     hot: true,
-    quiet: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'app/index.html',
+    }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env)
     }),
     new webpack.HotModuleReplacementPlugin(),
     new FriendlyErrorsWebpackPlugin({

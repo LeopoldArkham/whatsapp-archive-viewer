@@ -1,107 +1,51 @@
 import React, { Fragment } from 'react';
-import { css } from 'emotion';
-import {
-  Pane,
-  Heading,
-  FilePicker,
-  Button,
-  majorScale,
-  Select,
-  Avatar,
-  Text,
-} from 'evergreen-ui';
+import { Sender } from './types';
 
-const styles = {
-  header: css`
-    z-index: 1;
-    display: flex;
-    justify-content: space-between;
-    background: whitesmoke;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    padding: ${majorScale(2)}px;
-  `,
-};
+interface HeaderProps {
+  handleChatUploaded: (raw: string | ArrayBuffer | null) => void;
+}
 
-const GreenSenderSelector = ({
-  senders,
-  greenSender,
-  handleChangeGreenSender,
-  isGroupChat,
-  chatLoaded,
-}) => {
-  if (!isGroupChat) {
-    const otherSender = Object.keys(senders).find((s) => s !== greenSender);
-    console.log(greenSender, otherSender);
-
-    return (
-      <Fragment>
-        <Avatar isSolid name={otherSender} size={32} />{' '}
-        <Text>{otherSender}</Text>
-        <Button
-          onClick={() => handleChangeGreenSender(otherSender)}
-          disabled={!chatLoaded}>
-          Swap sides
-        </Button>
-        <Avatar isSolid name={greenSender} size={32} />{' '}
-        <Text>{greenSender}</Text>
-      </Fragment>
-    );
-  } else {
-    return (
-      <div style={{ width: '170px' }}>
-        <Select onChange={(e) => handleChangeGreenSender(e.target.value)}>
-          {Object.keys(senders).map((s) => (
-            <option value={s}>{s}</option>
-          ))}
-        </Select>
-      </div>
-    );
-  }
-};
-
-const Header = ({
-  handleChatUploaded,
-  chatLoaded,
-  senders,
-  greenSender,
-  handleChangeGreenSender,
-  isGroupChat,
-}) => {
-  let reader;
+const Header = ({ handleChatUploaded }: HeaderProps) => {
+  let reader: FileReader;
 
   const handleFileRead = () => {
     const content = reader.result;
     handleChatUploaded(content);
   };
 
-  const handleFileChosen = (e) => {
-    const file = e[0];
+  const handleFileChosen = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files == null) {
+      console.error(
+        'When handling uploaded file, `e.target.files` was null or undefined'
+      );
+      return;
+    }
+
+    const file = e.target.files[0];
     reader = new FileReader();
     reader.onloadend = handleFileRead;
+    console.log(reader);
     reader.readAsText(file);
   };
 
   return (
-    <Pane display="flex" className={styles.header}>
-      <Heading size={700}>Whatsapp Archive Viewer</Heading>
-      {chatLoaded && (
-        <GreenSenderSelector
-          greenSender={greenSender}
-          senders={senders}
-          handleChangeGreenSender={handleChangeGreenSender}
-          chatLoaded={chatLoaded}
-          isGroupChat={isGroupChat}
-        />
-      )}
-      <FilePicker
+    <div className="fixed w-full border-b border-cyan-200/30 backdrop-blur-sm z-10 px-8 flex flex-center justify-between items-center h-20 bg-slate-900/80">
+      <h2 className="text-white text-2xl">Whatsapp Archive Viewer</h2>
+      <input
+        id="file-upload"
+        type="file"
         multiple={false}
         placeholder="Upload a WhatsApp archive file"
         accept=".txt"
         onChange={handleFileChosen}
+        className="hidden"
       />
-    </Pane>
+      <label
+        htmlFor="file-upload"
+        className="text-slate-200 bg-sky-500  text-l rounded-lg px-3 py-2 cursor-pointer hover:bg-sky-400 hover:file:text-slate-100 transition-all">
+        Choose a file{' '}
+      </label>
+    </div>
   );
 };
 
