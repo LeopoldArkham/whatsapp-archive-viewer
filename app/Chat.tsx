@@ -82,19 +82,16 @@ function entryIsDateMarker(entry: ChatEntry): entry is DateMarker {
   return typeof entry === 'string';
 }
 
-interface BodyProps {
+interface ChatProps {
   chat: Array<ChatEntry>;
   senders: Array<Sender>;
   greenSender: Sender;
-  useRenderLimit: boolean;
 }
 
-const Body = ({ chat, senders, useRenderLimit }: BodyProps) => {
-  const list = useRenderLimit ? chat.slice(0, THRESHOLD) : chat;
-
+export const Chat = ({ chat, senders }: ChatProps) => {
   return (
     <div className="bg-slate-800 px-[15vw] pt-24 min-h-full">
-      {list.map((entry, index) => {
+      {chat.map((entry, index) => {
         if (entryIsDateMarker(entry)) {
           return (
             <div key={index} className={styles.dateStamp}>
@@ -107,7 +104,7 @@ const Body = ({ chat, senders, useRenderLimit }: BodyProps) => {
 
           // If this message is the first of a group from the same author,
           // it will display a speech bubble tick.
-          const nextMessage = list.slice(index + 1).find(entryIsMessage);
+          const nextMessage = chat.slice(index + 1).find(entryIsMessage);
           const isLastOfGroup = message.author !== nextMessage?.author;
 
           return (
@@ -124,5 +121,3 @@ const Body = ({ chat, senders, useRenderLimit }: BodyProps) => {
     </div>
   );
 };
-
-export default Body;

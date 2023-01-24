@@ -1,20 +1,20 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useReducer } from 'react';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 dayjs.extend(advancedFormat);
 
 import Header from './Header';
-import Body from './Body';
+import { Chat } from './Chat';
+import { Wizard } from './Wizard';
 import { COLORS } from './colors';
 import { ChatEntry, Color, DateMarker, Message, Sender } from './types';
 import { messageRegex } from './regex';
 import testChat from './testChat';
-import { Placeholder } from './Placeholder';
 
-function processChat(raw: string): {
+async function processChat(raw: string): Promise<{
   messages: Array<ChatEntry>;
   senders: Array<Sender>;
-} {
+}> {
   const parsed = Array.from(raw.matchAll(messageRegex));
 
   // Get and parse the date of the first message
@@ -33,7 +33,7 @@ function processChat(raw: string): {
     senders,
   }: {
     entries: Array<ChatEntry>;
-    senders: Array<Omit<Sender, 'color'>>;
+    senders: Set<Sender['name']>;
   } = parsed.reduce(
     (acc, entry) => {
       if (entry.groups == null) {
@@ -56,55 +56,51 @@ function processChat(raw: string): {
             ...acc.entries,
             ...(isSameDay ? [message] : [dateMarker, message]),
           ],
-          senders: [...acc.senders, { name: message.author }],
+          senders: acc.senders.add(message.author),
         };
       }
     },
-    { entries: [initialDate], senders: {} } as {
+    { entries: [initialDate], senders: new Set() } as {
       entries: Array<ChatEntry>;
-      senders: Array<Omit<Sender, 'color'>>;
+      senders: Set<Sender['name']>;
     }
   );
 
-  const sendersWithColors: Array<Sender> = senders.map((sender, idx) => ({
-    ...sender,
-    color: COLORS[idx % COLORS.length],
-  }));
+  const sendersWithColors: Array<Sender> = Array.from(
+    senders,
+    (sender, idx) => ({ name: sender, color: COLORS[idx % COLORS.length] })
+  );
 
   return { messages: entries, senders: sendersWithColors };
 }
 
 const GlobalAppContext = createContext<{
-  greenSender: Sender | null;
-}>({ greenSender: null });
+  greenSender: Sender | undefined;
+}>({ greenSender: undefined });
 
 export function useGlobalAppState() {
   return useContext(GlobalAppContext);
 }
 
+export const enum ApplicationStep {
+  WelcomeScreen = 0,
+  Processing = 1,
+  SelectSender = 2,
+  DisplayChat = 3,
+}
+
 export const App = () => {
   // Data
-  const [chat, setChat] = useState<Array<ChatEntry> | null>(
-    process.env.APP_ENV === 'development' ? testChat : null
-  );
+  const [chat, setChat] = useState<Array<ChatEntry> | null>(null);
 
-  const [greenSender, setGreenSender] = useState<Sender | null>(
-    process.env.APP_ENV === 'development' ? { name: 'Me', color: '' } : null
-  );
+  const [greenSender, setGreenSender] = useState<Sender>();
 
-  const [senders, setSenders] = useState<Array<Sender> | null>(
-    process.env.APP_ENV === 'development'
-      ? [
-          { name: 'Me', color: '' },
-          { name: 'Her', color: '' },
-        ]
-      : null
-  );
+  const [senders, setSenders] = useState<Array<Sender> | undefined>(undefined);
 
-  // UI
-  const [useRenderLimit, setUseRenderLimit] = useState(true);
+  const [applicationCurrentStep, setApplicationCurrentStep] =
+    useState<ApplicationStep>(ApplicationStep.WelcomeScreen);
 
-  const handleChatUploaded = (raw: string | ArrayBuffer | null) => {
+  const handleChatUploaded = async (raw: string | ArrayBuffer | null) => {
     if (typeof raw !== 'string') {
       console.error(
         `In \`handleChatUploaded\`, expected input to be \`string\` but received \`${typeof raw}\``
@@ -113,42 +109,46 @@ export const App = () => {
       return;
     }
 
-    setChat(null);
-    setUseRenderLimit(true);
+    // ! Understand why the state isn't updated here
+    setApplicationCurrentStep(ApplicationStep.Processing);
 
-    const { messages, senders } = processChat(raw);
-    const greenSender = senders[0];
-
+    const { messages, senders } = await processChat(raw);
     setSenders(senders);
-    setGreenSender(greenSender);
     setChat(messages);
 
-    setTimeout(() => {
-      setUseRenderLimit(false);
-    }, 500);
+    setApplicationCurrentStep(ApplicationStep.SelectSender);
   };
 
-  const handleChangeGreenSender = (newSender: Sender) => {
-    setUseRenderLimit(true);
-    setGreenSender(newSender);
+  const handleGreenSenderSelected = (name: Sender['name']) => {
+    const greenSender = senders?.find((sender) => sender.name === name);
 
-    setTimeout(() => {
-      setUseRenderLimit(false);
-    }, 500);
+    if (greenSender == null) {
+      console.error(
+        'Invariant violated: A green sender was sent which was nou found in the initial list.'
+      );
+    }
+
+    setGreenSender(greenSender);
+    setApplicationCurrentStep(ApplicationStep.DisplayChat);
   };
 
   return (
     <GlobalAppContext.Provider value={{ greenSender }}>
-      <div className="h-full">
+      <div className="h-full overflow-x-hidden">
         <Header handleChatUploaded={handleChatUploaded} />
-        {chat == null || senders == null || greenSender == null ? (
-          <Placeholder handleChatUploaded={handleChatUploaded} />
-        ) : (
-          <Body
-            chat={chat}
+        {applicationCurrentStep !== ApplicationStep.DisplayChat ? (
+          <Wizard
+            currentStep={applicationCurrentStep}
             senders={senders}
             greenSender={greenSender}
-            useRenderLimit={useRenderLimit}
+            onSelectGreenSender={handleGreenSenderSelected}
+          />
+        ) : (
+          <Chat
+            // todo: remove non-null assertions
+            chat={chat!}
+            senders={senders!}
+            greenSender={greenSender!}
           />
         )}
       </div>
