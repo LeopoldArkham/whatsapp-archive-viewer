@@ -1,4 +1,10 @@
-import React, { useState, createContext, useContext, useReducer } from 'react';
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+} from 'react';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 dayjs.extend(advancedFormat);
@@ -11,10 +17,10 @@ import { ChatEntry, Color, DateMarker, Message, Sender } from './types';
 import { messageRegex } from './regex';
 import testChat from './testChat';
 
-async function processChat(raw: string): Promise<{
+function processChat(raw: string): {
   messages: Array<ChatEntry>;
   senders: Array<Sender>;
-}> {
+} {
   const parsed = Array.from(raw.matchAll(messageRegex));
 
   // Get and parse the date of the first message
@@ -91,6 +97,7 @@ export const enum ApplicationStep {
 
 export const App = () => {
   // Data
+  const [rawChat, setRawChat] = useState<string | null>(null);
   const [chat, setChat] = useState<Array<ChatEntry> | null>(null);
 
   const [greenSender, setGreenSender] = useState<Sender>();
@@ -100,7 +107,19 @@ export const App = () => {
   const [applicationCurrentStep, setApplicationCurrentStep] =
     useState<ApplicationStep>(ApplicationStep.WelcomeScreen);
 
-  const handleChatUploaded = async (raw: string | ArrayBuffer | null) => {
+  useEffect(() => {
+    if (
+      rawChat != null &&
+      applicationCurrentStep === ApplicationStep.Processing
+    ) {
+      const { messages, senders } = processChat(rawChat);
+      setSenders(senders);
+      setChat(messages);
+      setApplicationCurrentStep(ApplicationStep.SelectSender);
+    }
+  }, [rawChat == null, applicationCurrentStep]);
+
+  const handleChatUploaded = (raw: string | ArrayBuffer | null) => {
     if (typeof raw !== 'string') {
       console.error(
         `In \`handleChatUploaded\`, expected input to be \`string\` but received \`${typeof raw}\``
@@ -109,14 +128,11 @@ export const App = () => {
       return;
     }
 
-    // ! Understand why the state isn't updated here
     setApplicationCurrentStep(ApplicationStep.Processing);
-
-    const { messages, senders } = await processChat(raw);
-    setSenders(senders);
-    setChat(messages);
-
-    setApplicationCurrentStep(ApplicationStep.SelectSender);
+    // ? This is a hack that forces React not to batch the two state updates.
+    // ? If it does, the actual processing (triggered by useEffect above) prevents the app
+    // ? from switching to the "Processing" state.
+    setTimeout(() => setRawChat(raw), 1);
   };
 
   const handleGreenSenderSelected = (name: Sender['name']) => {
