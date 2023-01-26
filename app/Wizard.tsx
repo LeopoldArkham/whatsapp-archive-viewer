@@ -86,6 +86,7 @@ export const Wizard = ({
             const isGreenSender = sender.name === greenSender?.name;
             return (
               <button
+                key={sender.name}
                 onClick={() => onSelectGreenSender(sender.name)}
                 className={cx(
                   'my-2 text-slate-200 hover:text-white hover:text-sha transition-all  hover:ring-2  ring-offset-0 hover:ring-lime-300 hover:bg-gradient-to-bl hover:from-lime-600 hover:to-lime-700  rounded-md text-lg px-4 py-2 ring-inset ring-1  ring-slate-300 click active:from-lime-700 active:to-lime-800 active:ring-lime-400',

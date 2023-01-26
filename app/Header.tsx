@@ -24,7 +24,6 @@ const Header = ({ handleChatUploaded }: HeaderProps) => {
     const file = e.target.files[0];
     reader = new FileReader();
     reader.onloadend = handleFileRead;
-    console.log(reader);
     reader.readAsText(file);
   };
 
