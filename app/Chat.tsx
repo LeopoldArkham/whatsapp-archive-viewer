@@ -7,25 +7,18 @@ const THRESHOLD = 100;
 
 const styles = {
   message: css`
-    font-family: 'Segoe UI';
     max-width: 66%;
     width: fit-content;
   `,
   dateStamp: css`
-    position: sticky;
-    top: 80px;
     padding: 8px;
     margin: 10px auto 10px auto;
     background-color: #e1f3fb;
     width: 120px;
     text-align: center;
     border-radius: 10px;
-    font-family: 'Segoe UI';
     box-shadow: 0px 1px 0px 0px rgba(184, 184, 184, 0.8);
     z-index: 5;
-  `,
-  padRight: css`
-    padding-right: 60px;
   `,
   author: css`
     font-weight: bold;
@@ -46,7 +39,7 @@ const Message = ({ message, showTick, senders }: MessageProps) => {
     <div
       className={cx(
         styles.message,
-        'm-2 rounded-xl relative first:mt-0 p-2 text-white',
+        'm-2 rounded-xl relative first:mt-0 p-2 pl-3 text-white [text-shadow:_0_1px_0_rgb(0_0_0_/_40%)]',
         isGreenSender
           ? 'bg-gradient-to-b from-lime-500 to-lime-600 m-2 ml-auto'
           : 'bg-gradient-to-b from-cyan-500 to-cyan-600 mr-auto',
@@ -55,7 +48,7 @@ const Message = ({ message, showTick, senders }: MessageProps) => {
       )}>
       {isGreenSender || !(senders.length > 2) ? null : (
         <div
-          className={styles.author}
+          className="font-bold"
           style={{
             color: senders.find((author) => author.name === message.author)
               ?.color,
@@ -90,11 +83,13 @@ interface ChatProps {
 
 export const Chat = ({ chat, senders }: ChatProps) => {
   return (
-    <div className="bg-slate-800 px-[15vw] pt-24 min-h-full">
+    <div className="bg-slate-800 font-['Segoe_UI'] px-[15vw] pt-24 min-h-full">
       {chat.map((entry, index) => {
         if (entryIsDateMarker(entry)) {
           return (
-            <div key={index} className={styles.dateStamp}>
+            <div
+              key={index}
+              className="bg-zinc-600 rounded-full px-3 py-1 my-3 w-fit mx-auto text-sm text-zinc-300 [text-shadow:_0_1px_0_rgb(0_0_0_/_40%)] ">
               {entry}
             </div>
           );
@@ -102,10 +97,13 @@ export const Chat = ({ chat, senders }: ChatProps) => {
           // Poor man's `if let` in Rust, I miss it.
           const message = entry;
 
-          // If this message is the first of a group from the same author,
-          // it will display a speech bubble tick.
-          const nextMessage = chat.slice(index + 1).find(entryIsMessage);
-          const isLastOfGroup = message.author !== nextMessage?.author;
+          // If this message is the last of a group from the same author,
+          // it will display a stylized speech bubble tick.
+          const nextMessage = chat.at(index + 1);
+          const isLastOfGroup =
+            nextMessage == null ||
+            entryIsDateMarker(nextMessage) ||
+            nextMessage?.author !== message.author;
 
           return (
             <Message

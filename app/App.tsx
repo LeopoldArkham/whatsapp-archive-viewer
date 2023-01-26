@@ -150,7 +150,7 @@ export const App = () => {
 
   return (
     <GlobalAppContext.Provider value={{ greenSender }}>
-      <div className="h-full overflow-x-hidden">
+      <div className="font-['Roboto'] h-full overflow-x-hidden">
         <Header handleChatUploaded={handleChatUploaded} />
         {applicationCurrentStep !== ApplicationStep.DisplayChat ? (
           <Wizard
